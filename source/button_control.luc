@@ -1,24 +1,24 @@
 module button_control (
     input clk,  // clock
-    input btn,
-    output out
+    input btn,  // button
+    output out  // output
   ) {
-  
+
   .clk(clk){
-    fsm bc = {MANUAL,AUTO};
+    fsm bc = {MANUAL,AUTO};  // FSM for manual and auto mode toggling
     }
 
   always {
-    bc.d = bc.q;
-    out = 0;
+    bc.d = bc.q;  // initializing
+    out = 0;  // initializing
     case(bc.q){
       bc.AUTO:
-        if (btn==1)
-          bc.d = bc.MANUAL;
+        if (btn==1)  // button pressed
+          bc.d = bc.MANUAL;  // switch to MANUAL
         out=1;
       bc.MANUAL:
-        if (btn==1)
-          bc.d = bc.AUTO;
+        if (btn==1)  // button pressed
+          bc.d = bc.AUTO;  // switch to AUTO
         out=0;
       }
   }

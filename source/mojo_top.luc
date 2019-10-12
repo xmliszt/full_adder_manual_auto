@@ -14,15 +14,15 @@ module mojo_top (
     output io_led [3][8],   // LEDs on IO Shield
     input io_button [5],    // 5 buttons on IO Shield
     input io_dip [3][8],     // DIP switches on IO Shield
-    output outA,
-    output outB,
-    output outC,
-    input inSum,
-    input inCout
+    output outA,  // output A as input to full-adder circuit
+    output outB,  // output B as input to full-adder circuit
+    output outC,  // output C_in as input to full-adder circuit
+    input inSum,  // take value of SUM and input to Mojo
+    input inCout  // take value of C_out and input to Mojo
   ) {
-  
+
   sig rst;                  // reset signal
-  
+
   .clk(clk) {
     // The reset conditioner is used to synchronize the reset signal to the FPGA
     // clock. This ensures the entire FPGA comes out of reset at the same time.
@@ -31,48 +31,48 @@ module mojo_top (
     edge_detector edge_detector(#RISE(1),#FALL(0));
     button_control bc;
     .rst(rst){
-      counter delayclk(#SIZE(3),#DIV(26));
+      counter delayclk(#SIZE(3),#DIV(26));  // set a 26 bits counter with size 3
       }
   }
-  
+
   always {
     reset_cond.in = ~rst_n; // input raw inverted reset signal
     rst = reset_cond.out;   // conditioned reset
-    
+
     led = 8h00;             // turn LEDs off
     io_led = 3x{{8h00}};    // turn all io_led OFF
     spi_miso = bz;          // not using SPI
     spi_channel = bzzzz;    // not using flags
     avr_rx = bz;            // not using serial port
-    
+
     btn_cond.in = io_button[0];  // connect io_button to btn_cond input
     edge_detector.in = btn_cond.out;  // connect output of btn_cond to edge_detector
     bc.btn = edge_detector.out;  // connect output of edge_detector to button_control
-    
+
     // manual mode
     if(bc.out == 0){
-      io_led[0] = 8x{1}; // LEDs ON indicating manual mode
-      outA = io_dip[2][0];
-      outB = io_dip[2][1];
-      outC = io_dip[2][3];
-      io_led[1][2] = io_dip[2][0];
-      io_led[1][3] = io_dip[2][1];
-      io_led[1][4] = io_dip[2][3];
+      io_led[0] = 8x{1};  // LEDs ON indicating manual mode
+      outA = io_dip[2][0];  // set input A using DIP switch
+      outB = io_dip[2][1];  // set input B using DIP switch
+      outC = io_dip[2][3];  // set input C_in using DIP switch
+      io_led[1][2] = io_dip[2][0];  // LED ON indicating input A is 1
+      io_led[1][3] = io_dip[2][1];  // LED ON indicating input B is 1
+      io_led[1][4] = io_dip[2][3];  // LED ON indicating input C_in is 1
       }
     // auto mode
     else{
-      io_led[0][7:0] = 8x{0}; // LEDs OFF indicating auto mode
-      outA = delayclk.value[0];
-      outB = delayclk.value[1];
-      outC = delayclk.value[2];
-      io_led[1][2] = delayclk.value[0];
-      io_led[1][3] = delayclk.value[1];
-      io_led[1][4] = delayclk.value[2];    
+      io_led[0][7:0] = 8x{0};  // LEDs OFF indicating auto mode
+      outA = delayclk.value[0];  // set input A
+      outB = delayclk.value[1];  // set input B
+      outC = delayclk.value[2];  // set input C_in
+      io_led[1][2] = delayclk.value[0];  // LED ON indicating input A is 1
+      io_led[1][3] = delayclk.value[1];  // LED ON indicating input B is 1
+      io_led[1][4] = delayclk.value[2];  // LED ON indicating input C_in is 1
      }
-    
-     io_led[1][0] = inSum;
-     io_led[1][1] = inCout;  
-   
-    
+
+     io_led[1][0] = inSum;  // LED ON indicating SUM is 1
+     io_led[1][1] = inCout;  // LED ON indicating Carry-out is 1
+
+
   }
 }
