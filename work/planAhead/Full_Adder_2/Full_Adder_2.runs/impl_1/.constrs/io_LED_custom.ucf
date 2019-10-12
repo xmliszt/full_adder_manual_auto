@@ -1,0 +1,11 @@
+NET "outA" LOC = P6;
+NET "outA" IOSTANDARD = LVTTL;
+NET "outB" LOC = P12;
+NET "outB" IOSTANDARD = LVTTL;
+NET "outC" LOC = P16;
+NET "outC" IOSTANDARD = LVTTL;
+
+NET "inSum" LOC = P5;
+NET "inSum" IOSTANDARD = LVTTL;
+NET "inCout" LOC = P11;
+NET "inCout" IOSTANDARD = LVTTL;

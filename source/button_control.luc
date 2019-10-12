@@ -1,0 +1,25 @@
+module button_control (
+    input clk,  // clock
+    input btn,
+    output out
+  ) {
+  
+  .clk(clk){
+    fsm bc = {MANUAL,AUTO};
+    }
+
+  always {
+    bc.d = bc.q;
+    out = 0;
+    case(bc.q){
+      bc.AUTO:
+        if (btn==1)
+          bc.d = bc.MANUAL;
+        out=1;
+      bc.MANUAL:
+        if (btn==1)
+          bc.d = bc.AUTO;
+        out=0;
+      }
+  }
+}
